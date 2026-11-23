@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#e0f2fe"/>
+    </linearGradient>
+    <linearGradient id="iceLight" x1="16" y1="10" x2="38" y2="44" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#bae6fd"/>
+    </linearGradient>
+    <linearGradient id="iceCyan" x1="30" y1="12" x2="52" y2="46" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+    <linearGradient id="iceDeep" x1="20" y1="42" x2="48" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0e7490"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+  </defs>
+  <!-- Crisp rounded architectural badge -->
+  <rect width="64" height="64" rx="14" fill="url(#bg)"/>
+  <rect x="1" y="1" width="62" height="62" rx="13" stroke="#bae6fd" stroke-width="1.5"/>
+
+  <!-- Submerged / base glacial strata facet -->
+  <polygon points="10,43 24,54 44,54 54,43" fill="url(#iceDeep)" opacity="0.88"/>
+  <polygon points="24,54 33,43 44,54" fill="#06b6d4" opacity="0.55"/>
+
+  <!-- Main faceted glacier peaks -->
+  <!-- Left sunlit snow face -->
+  <polygon points="10,43 22,22 28,28 34,11 33,43" fill="url(#iceLight)"/>
+  <!-- Left secondary ridge shadow -->
+  <polygon points="22,22 28,28 24,43 10,43" fill="#7dd3fc" opacity="0.55"/>
+  <!-- Right luminous cyan ice face -->
+  <polygon points="34,11 45,27 49,23 54,43 33,43" fill="url(#iceCyan)"/>
+  <!-- Center crystalline facet highlight -->
+  <polygon points="34,11 39,28 33,43 27,30" fill="#e0f2fe" opacity="0.82"/>
+  <!-- Far right crisp ridge -->
+  <polygon points="45,27 49,23 54,43 43,43" fill="#0369a1" opacity="0.72"/>
+
+  <!-- Subtle architectural waterline horizon -->
+  <line x1="7" y1="43" x2="57" y2="43" stroke="#06b6d4" stroke-width="1.5" stroke-linecap="round"/>
+</svg>

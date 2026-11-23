@@ -1,0 +1,2346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WATER CONSERVATION — Interactive Glacial Island · Kai Kleinbard</title>
+
+    <!-- Primary Metadata & Attribution -->
+    <meta name="title" content="WATER CONSERVATION — Interactive Glacial Island">
+    <meta name="description" content="Lost Landscapes · Drawing Glaciers. An interactive 3D procedural glacial island by Kai Kleinbard featuring extended geological strata, isolated terrain schematics, and generative glacial audio.">
+    <meta name="author" content="Kai Kleinbard">
+    <meta name="creator" content="Kai Kleinbard">
+    <meta name="publisher" content="Kai Kleinbard">
+    <meta name="copyright" content="Kai Kleinbard">
+    <meta name="keywords" content="Water Conservation, Glacier, Interactive 3D, Glacial Island, Lost Landscapes, Drawing Glaciers, Kai Kleinbard, Three.js, Generative Audio, Procedural Terrain">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="application-name" content="Water Conservation">
+    <meta name="apple-mobile-web-app-title" content="Glacier">
+    <link rel="canonical" href="https://cre8ture.github.io/glacier/">
+
+    <!-- Glacier Icons -->
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png">
+    <link rel="icon" href="./favicon.ico" sizes="any">
+    <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
+    <link rel="manifest" href="./site.webmanifest">
+
+    <!-- Open Graph / Social Embed Preview (Facebook, Discord, Slack, iMessage, LinkedIn, Notion) -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Water Conservation — Kai Kleinbard">
+    <meta property="og:title" content="WATER CONSERVATION — Interactive Glacial Island">
+    <meta property="og:description" content="Lost Landscapes · Drawing Glaciers. An interactive 3D procedural glacial island by Kai Kleinbard featuring extended geological strata, isolated terrain schematics, and generative glacial audio.">
+    <meta property="og:url" content="https://cre8ture.github.io/glacier/">
+    <meta property="og:image" content="https://cre8ture.github.io/glacier/og-preview.jpg">
+    <meta property="og:image:secure_url" content="https://cre8ture.github.io/glacier/og-preview.jpg">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:width" content="1376">
+    <meta property="og:image:height" content="768">
+    <meta property="og:image:alt" content="Interactive 3D exploded architectural glacial island model titled Water Conservation by Kai Kleinbard">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Twitter / X Card Embed Preview -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="WATER CONSERVATION — Interactive Glacial Island">
+    <meta name="twitter:description" content="Lost Landscapes · Drawing Glaciers. An interactive 3D procedural glacial island by Kai Kleinbard featuring extended geological strata, isolated terrain schematics, and generative glacial audio.">
+    <meta name="twitter:image" content="https://cre8ture.github.io/glacier/og-preview.jpg">
+    <meta name="twitter:image:alt" content="Interactive 3D exploded architectural glacial island model titled Water Conservation by Kai Kleinbard">
+    <meta name="twitter:url" content="https://cre8ture.github.io/glacier/">
+
+    <!-- Structured Data (Schema.org JSON-LD) -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "WATER CONSERVATION — Interactive Glacial Island",
+        "alternateName": "Lost Landscapes · Drawing Glaciers",
+        "description": "An interactive 3D procedural glacial island by Kai Kleinbard featuring extended geological strata, isolated terrain schematics, and generative glacial audio.",
+        "url": "https://cre8ture.github.io/glacier/",
+        "image": "https://cre8ture.github.io/glacier/og-preview.jpg",
+        "thumbnailUrl": "https://cre8ture.github.io/glacier/og-preview.jpg",
+        "applicationCategory": "MultimediaApplication",
+        "operatingSystem": "Web",
+        "author": {
+            "@type": "Person",
+            "name": "Kai Kleinbard"
+        },
+        "creator": {
+            "@type": "Person",
+            "name": "Kai Kleinbard"
+        }
+    }
+    </script>
+    <!-- Tailwind CSS for clean, responsive architectural UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Three.js r128 for 3D procedural terrain & camera choreography -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Tone.js for generative ambient glacial audio -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #ffffff;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: #1e293b;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        #canvas-container {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            cursor: grab;
+            touch-action: none;
+        }
+        #canvas-container:active {
+            cursor: grabbing;
+        }
+        #canvas-container.pointer-hover {
+            cursor: pointer;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        /* Subtle glassmorphic architectural panels */
+        .hud-panel {
+            background: rgba(255, 255, 255, 0.86);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(148, 163, 184, 0.28);
+            box-shadow: 0 8px 30px rgba(15, 23, 42, 0.06);
+        }
+        .hud-btn {
+            transition: all 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .hud-btn:hover {
+            background-color: rgba(226, 232, 240, 0.65);
+            color: #0f172a;
+        }
+        .hud-btn.active {
+            background-color: #1e293b;
+            color: #ffffff;
+            box-shadow: 0 2px 10px rgba(30, 41, 59, 0.22);
+        }
+        .hud-btn.active-cyan {
+            background-color: #0e7490;
+            color: #ffffff;
+            box-shadow: 0 2px 12px rgba(14, 116, 144, 0.28);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        /* Floating architectural targeting boxes anchored directly to 3D Glacier Points */
+        #labels-overlay {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 15;
+            overflow: hidden;
+        }
+        .glacier-label {
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex;
+            align-items: center;
+            transition: opacity 0.28s ease;
+            will-change: transform, opacity;
+            pointer-events: auto;
+            cursor: pointer;
+        }
+        .glacier-label:hover .glacier-box {
+            border-color: #06b6d4;
+            transform: scale(1.22);
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.22), 0 4px 12px rgba(15, 23, 42, 0.16);
+        }
+        .glacier-label:hover .glacier-tag {
+            border-color: #06b6d4;
+            background: rgba(255, 255, 255, 0.98);
+            transform: translateX(2px);
+        }
+        /* Crisp square targeting box over the exact glacier point */
+        .glacier-box {
+            position: relative;
+            width: 16px;
+            height: 16px;
+            margin-left: -8px;
+            margin-top: -8px;
+            border: 1.5px solid rgba(15, 23, 42, 0.82);
+            background: rgba(255, 255, 255, 0.28);
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.8), 0 2px 6px rgba(15, 23, 42, 0.12);
+            flex-shrink: 0;
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .glacier-box::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 3.5px;
+            height: 3.5px;
+            border-radius: 9999px;
+            background: #06b6d4;
+            transform: translate(-50%, -50%);
+        }
+        .glacier-leader {
+            width: 15px;
+            height: 1px;
+            margin-top: -8px;
+            background: rgba(15, 23, 42, 0.48);
+            flex-shrink: 0;
+        }
+        .glacier-tag {
+            margin-top: -8px;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(100, 116, 139, 0.35);
+            border-radius: 4px;
+            padding: 3px 7px;
+            font-size: 9.5px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #0f172a;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.07);
+            transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+        }
+        .glacier-label.selected .glacier-box {
+            border-color: #06b6d4;
+            background: rgba(6, 182, 212, 0.22);
+            transform: scale(1.25);
+            box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.24);
+        }
+        .glacier-label.selected .glacier-tag {
+            border-color: #06b6d4;
+            background: #0f172a;
+            color: #ffffff;
+        }
+        .glacier-label.selected .glacier-label-sub {
+            color: #67e8f9;
+        }
+        .glacier-label-sub {
+            font-size: 8.5px;
+            font-weight: 400;
+            color: #64748b;
+            letter-spacing: 0.03em;
+            text-transform: none;
+        }
+
+        /* Right-Side Floating Architectural Schematic Components (Borderless, Staggered Animation) */
+        #schematic-floating-stack {
+            position: fixed;
+            top: 4.5rem;
+            right: 1rem;
+            bottom: 5.5rem;
+            z-index: 24;
+            width: min(90vw, 355px);
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 0.65rem;
+        }
+        @media (min-width: 640px) {
+            #schematic-floating-stack {
+                right: 1.75rem;
+            }
+        }
+        #schematic-floating-stack.visible {
+            pointer-events: auto;
+        }
+        .float-comp {
+            opacity: 0;
+            transform: translateX(34px) scale(0.96);
+            transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1), transform 0.52s cubic-bezier(0.22, 1, 0.36, 1);
+            pointer-events: none;
+        }
+        #schematic-floating-stack.visible .float-comp {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+            pointer-events: auto;
+        }
+        #schematic-floating-stack.visible .float-comp-1 { transition-delay: 0.04s; }
+        #schematic-floating-stack.visible .float-comp-2 { transition-delay: 0.12s; }
+        #schematic-floating-stack.visible .float-comp-3 { transition-delay: 0.20s; }
+        #schematic-floating-stack.visible .float-comp-4 { transition-delay: 0.28s; }
+
+        .stage-card {
+            transition: all 0.22s ease;
+            border: 1px solid rgba(148, 163, 184, 0.28);
+            background: rgba(255, 255, 255, 0.84);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .stage-card:hover {
+            background: rgba(255, 255, 255, 0.96);
+            border-color: rgba(100, 116, 139, 0.48);
+            transform: translateY(-1px);
+        }
+        .stage-card.active {
+            background: rgba(236, 254, 255, 0.94);
+            border-color: rgba(6, 182, 212, 0.85);
+            box-shadow: 0 4px 14px rgba(6, 182, 212, 0.16);
+        }
+    </style>
+</head>
+<body class="bg-white text-slate-800">
+
+    <!-- 3D WebGL Viewport -->
+    <div id="canvas-container" aria-label="Interactive 3D Glacial Island"></div>
+
+    <!-- Floating Architectural Callout Boxes anchored to 3D Glacier Points -->
+    <div id="labels-overlay" aria-hidden="true"></div>
+
+    <!-- Top-Left Architectural Header -->
+    <header class="fixed top-4 left-4 sm:top-6 sm:left-6 z-20 pointer-events-none max-w-xs sm:max-w-sm">
+        <div class="pointer-events-auto inline-flex flex-col gap-1">
+            <div class="flex items-center gap-2.5">
+                <span class="h-[1px] w-5 bg-cyan-500/80"></span>
+                <span id="header-kicker" class="text-[10px] sm:text-[11px] font-medium tracking-[0.22em] uppercase text-slate-400">
+                    Lost Landscapes · Drawing Glaciers
+                </span>
+            </div>
+            <h1 id="header-title" class="text-lg sm:text-xl font-light tracking-[0.16em] text-slate-800 uppercase">
+                Water Conservation
+            </h1>
+            <p id="header-attribution" class="text-[10px] sm:text-[11px] font-medium tracking-[0.16em] uppercase text-slate-500">
+                By Kai Kleinbard
+            </p>
+            <p id="header-subtitle" class="text-[11px] sm:text-xs text-slate-400 font-light leading-relaxed hidden sm:block">
+                Click any labeled glacier point to isolate that terrain chunk in the schematic panel, click the terrain for Inception Orbit, or play Glacial Audio.
+            </p>
+        </div>
+    </header>
+
+    <!-- Top-Right Navigation Controls -->
+    <div class="fixed top-4 right-4 sm:top-6 sm:right-6 z-20 flex items-center gap-2">
+        <button id="btn-reset" title="Reset View" class="hud-panel hud-btn rounded-full p-2.5 text-slate-600 flex items-center justify-center" aria-label="Reset View">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Right-Side Floating Architectural Schematic Components (No Enclosing Box) -->
+    <aside id="schematic-floating-stack" aria-label="Glacier Section Schematic Components">
+        <!-- Component 1: Floating Header & Section Switcher -->
+        <div class="float-comp float-comp-1 flex flex-col gap-1.5">
+            <div class="flex items-center justify-between gap-2">
+                <div class="hud-panel rounded-xl px-3 py-2 flex flex-col gap-0.5">
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-cyan-500"></span>
+                        <span id="schematic-kicker" class="text-[9px] font-semibold tracking-[0.18em] uppercase text-cyan-700">
+                            Section Specimen
+                        </span>
+                    </div>
+                    <h2 id="schematic-section-title" class="text-xs sm:text-sm font-semibold tracking-[0.1em] uppercase text-slate-800">
+                        Alpine Summit
+                    </h2>
+                </div>
+                <button id="btn-close-drawer" class="hud-panel hud-btn rounded-full px-3 py-2 text-[10px] font-semibold tracking-wider uppercase text-slate-700 flex items-center gap-1.5 shrink-0" aria-label="Zoom Back Out" title="Return to Whole Island">
+                    <svg class="w-3.5 h-3.5 text-cyan-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                    <span>Whole Island</span>
+                </button>
+            </div>
+            <div id="schematic-section-pills" class="flex items-center gap-1 overflow-x-auto no-scrollbar"></div>
+        </div>
+
+        <!-- Component 2: Floating Isolated 3D Glacier Chunk (Transparent Background) -->
+        <div class="float-comp float-comp-2 relative rounded-2xl overflow-hidden shrink-0" style="height: 205px;">
+            <div id="chunk-preview-container" class="w-full h-full cursor-grab active:cursor-grabbing"></div>
+            <div class="absolute top-2 left-2 pointer-events-none flex items-center gap-1.5 hud-panel rounded-md px-2 py-0.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-cyan-500"></span>
+                <span class="text-[8.5px] font-semibold tracking-wider uppercase text-slate-700">Isolated Terrain Chunk</span>
+            </div>
+            <div class="absolute bottom-2 right-2 pointer-events-none text-[8.5px] font-medium text-slate-500 bg-white/80 backdrop-blur-sm rounded px-1.5 py-0.5">
+                Drag to rotate
+            </div>
+        </div>
+
+        <!-- Component 3: Floating Geological Telemetry Chips -->
+        <div id="schematic-metrics" class="float-comp float-comp-3 grid grid-cols-3 gap-1.5 shrink-0"></div>
+
+        <!-- Component 4: Floating Morphological Schematic Cards & Readout -->
+        <div class="float-comp float-comp-4 flex flex-col gap-1.5">
+            <div id="schematic-stages-grid" class="grid grid-cols-3 gap-1.5"></div>
+            <div id="schematic-stage-detail" class="hud-panel rounded-xl p-2.5 text-[10.5px] text-slate-600 leading-relaxed"></div>
+        </div>
+    </aside>
+
+    <!-- Subtle Floating Toast Hint -->
+    <div id="toast-hint" class="fixed top-20 left-1/2 -translate-x-1/2 z-20 pointer-events-none transition-all duration-500 opacity-0 -translate-y-2">
+        <div class="hud-panel rounded-full px-4 py-1.5 text-xs font-medium text-slate-700 tracking-wide flex items-center gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-cyan-500"></span>
+            <span id="toast-message">Inception Orbit Engaged</span>
+        </div>
+    </div>
+
+    <!-- Bottom Architectural Control Dock (Clean Single Row) -->
+    <nav class="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-20 w-[94vw] max-w-2xl flex flex-col items-center pointer-events-none">
+        <div class="pointer-events-auto hud-panel rounded-2xl p-1.5 flex items-center gap-1.5 overflow-x-auto no-scrollbar max-w-full">
+            <button id="btn-layers" class="hud-btn active rounded-xl px-3.5 py-2 text-[11px] sm:text-xs font-medium whitespace-nowrap flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-cyan-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                </svg>
+                <span>Extended Layers</span>
+            </button>
+            <div class="w-[1px] h-5 bg-slate-200 mx-0.5 shrink-0"></div>
+            <button id="btn-regenerate" class="hud-btn rounded-xl px-3.5 py-2 text-[11px] sm:text-xs font-medium text-slate-700 whitespace-nowrap flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-cyan-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.678 48.678 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3l-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3l-3 3"></path>
+                </svg>
+                <span>Regenerate</span>
+            </button>
+            <button id="btn-audio" class="hud-btn rounded-xl px-3.5 py-2 text-[11px] sm:text-xs font-medium text-slate-700 whitespace-nowrap flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-cyan-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z"></path>
+                </svg>
+                <span id="audio-btn-text">Glacial Audio</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Fallback Error Message Box (Hidden unless WebGL fails) -->
+    <div id="webgl-error" class="hidden fixed inset-0 z-50 bg-white flex items-center justify-center p-6">
+        <div class="max-w-md text-center space-y-3 border border-slate-200 rounded-2xl p-6 shadow-sm">
+            <h2 class="text-base font-semibold text-slate-800">3D View Unavailable</h2>
+            <p class="text-sm text-slate-500">WebGL could not be initialized on this device or browser. Please ensure hardware acceleration is enabled.</p>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * ============================================================================
+         * DIGITISED LAND — Procedural Glacial Island, Extended Layers, Audio &
+         *                  Architectural Section Schematic Decomposition
+         * ============================================================================
+         */
+
+        // ----------------------------------------------------------------------------
+        // 1. PROCEDURAL TERRAIN NOISE & GLACIAL TOPOGRAPHY SAMPLER
+        // ----------------------------------------------------------------------------
+        const ISLAND_SIZE = 7.6;
+        const HALF_SIZE = ISLAND_SIZE * 0.5;
+
+        const TerrainMath = (() => {
+            let seed = 41729;
+
+            function hash2D(ix, iz) {
+                let n = Math.imul(ix, 374761393) + Math.imul(iz, 668265263) + Math.imul(seed, 1442695041);
+                n = (n ^ (n >>> 13)) >>> 0;
+                n = Math.imul(n, 1274126177) >>> 0;
+                return ((n ^ (n >>> 16)) >>> 0) / 4294967295;
+            }
+
+            function noise2D(x, z) {
+                const ix = Math.floor(x);
+                const iz = Math.floor(z);
+                const fx = x - ix;
+                const fz = z - iz;
+                const ux = fx * fx * (3 - 2 * fx);
+                const uz = fz * fz * (3 - 2 * fz);
+
+                const a = hash2D(ix, iz);
+                const b = hash2D(ix + 1, iz);
+                const c = hash2D(ix, iz + 1);
+                const d = hash2D(ix + 1, iz + 1);
+
+                return (a + (b - a) * ux + (c - a) * uz + (a - b - c + d) * ux * uz) * 2 - 1;
+            }
+
+            function fbm(x, z, octaves = 5) {
+                let val = 0;
+                let amp = 0.5;
+                let freq = 1.0;
+                for (let i = 0; i < octaves; i++) {
+                    val += amp * noise2D(x * freq, z * freq);
+                    freq *= 2.04;
+                    amp *= 0.49;
+                }
+                return val;
+            }
+
+            function ridgedFbm(x, z, octaves = 4) {
+                let val = 0;
+                let amp = 0.5;
+                let freq = 1.0;
+                for (let i = 0; i < octaves; i++) {
+                    const n = 1.0 - Math.abs(noise2D(x * freq, z * freq));
+                    val += amp * (n * n);
+                    freq *= 2.1;
+                    amp *= 0.48;
+                }
+                return val;
+            }
+
+            function reseed() {
+                seed = Math.floor(10000 + Math.random() * 89999);
+                return seed;
+            }
+
+            /**
+             * Samples height (y) and glacial ice concentration (glacier) at normalized [-1, 1] coords
+             */
+            function sampleGlacier(nx, nz) {
+                const r = Math.hypot(nx * 0.96, nz * 0.96);
+                const islandMask = Math.max(0.15, 1.0 - Math.pow(Math.max(0, r - 0.18), 2.35) * 0.62);
+
+                const baseMass = fbm(nx * 1.65 + 3.1, nz * 1.65 - 1.7, 4) * 0.85;
+                const ridges = ridgedFbm(nx * 2.25 - 0.8, nz * 2.25 + 2.4, 4) * 1.75;
+                const microDetail = fbm(nx * 7.5, nz * 7.5, 3) * 0.16;
+
+                // Winding glacial ice channel cutting diagonally across the island
+                const channelCurve = Math.sin(nz * 2.3 + fbm(nx * 1.5, nz * 1.5, 2) * 1.2) * 0.34 - 0.08;
+                const distToChannel = Math.abs(nx - channelCurve);
+                const glacier = Math.max(0, Math.min(1, Math.exp(-distToChannel * distToChannel * 11.5) * (0.72 + fbm(nx * 3.0, nz * 3.0, 2) * 0.38)));
+
+                const valleyCarve = glacier * 0.55;
+                const rawHeight = (0.55 + baseMass + ridges + microDetail - valleyCarve) * islandMask;
+                const y = Math.max(0.18, rawHeight * 1.38);
+
+                return { y, glacier };
+            }
+
+            return { noise2D, fbm, ridgedFbm, sampleGlacier, reseed };
+        })();
+
+        // ----------------------------------------------------------------------------
+        // 2. APPLICATION STATE & THREE.JS SCENE GLOBALS
+        // ----------------------------------------------------------------------------
+        const state = {
+            currentSeed: 41729,
+            explodeAmount: 1.0,
+            targetExplode: 1.0,
+            inceptionOrbit: false,
+            orbitTime: 0,
+            cam: {
+                theta: Math.PI * 0.25,
+                targetTheta: Math.PI * 0.25,
+                phi: Math.PI * 0.35,
+                targetPhi: Math.PI * 0.35,
+                radius: 18.2,
+                targetRadius: 18.2,
+                lookX: 0,
+                targetLookX: 0,
+                lookY: -0.55,
+                targetLookY: -0.55,
+                lookZ: 0,
+                targetLookZ: 0,
+                roll: 0,
+                targetRoll: 0
+            },
+            pointer: {
+                isDown: false,
+                startX: 0,
+                startY: 0,
+                lastX: 0,
+                lastY: 0,
+                moved: 0,
+                pinchDist: 0
+            },
+            schematic: {
+                active: false,
+                sectionIndex: -1,
+                stageIndex: 0
+            }
+        };
+
+        let container = null;
+        let scene = null;
+        let camera = null;
+        let renderer = null;
+        let raycaster = null;
+
+        let islandRoot = null;
+        let topLayerGroup = null;
+        let contourLayerGroup = null;
+        let pointLayerGroup = null;
+        let baseLayerGroup = null;
+        let verticalGuideLines = null;
+        let softGroundShadow = null;
+        let audioProjectionsGroup = null;
+
+        let clickableMeshes = [];
+        let topColorData = null;
+
+        // ----------------------------------------------------------------------------
+        // 3. GENERATIVE GLACIAL AUDIO + ILLUMINATED ICE CHINKS & LAYER PROJECTIONS
+        // ----------------------------------------------------------------------------
+        const GlacialAudio = (() => {
+            let isPlaying = false;
+            let initialized = false;
+            let loopEvent = null;
+            let stepIndex = 0;
+
+            let masterFilter = null;
+            let reverb = null;
+            let delay = null;
+            let leadSynth = null;
+            let padSynth = null;
+            let bassSynth = null;
+            let pulseSynth = null;
+
+            const activeChinks = [];
+            const activeBeams = [];
+
+            const CHORDS = [
+                { pad: ['D2', 'A2', 'F3', 'E4'], scale: ['D3', 'F3', 'A3', 'C4', 'E4', 'G4'], bass: 'D1' },
+                { pad: ['Bb1', 'F2', 'D3', 'A3'], scale: ['Bb2', 'D3', 'F3', 'A3', 'C4', 'D4'], bass: 'Bb1' },
+                { pad: ['F2', 'C3', 'A3', 'G4'], scale: ['F3', 'A3', 'C4', 'E4', 'G4'], bass: 'F1' },
+                { pad: ['C2', 'G2', 'D3', 'E3'], scale: ['C3', 'E3', 'G3', 'B3', 'D4'], bass: 'C2' }
+            ];
+
+            const NOTE_PALETTE = [
+                new THREE.Color('#06b6d4'),
+                new THREE.Color('#0284c7'),
+                new THREE.Color('#7c3aed'),
+                new THREE.Color('#ec4899'),
+                new THREE.Color('#10b981'),
+                new THREE.Color('#2563eb')
+            ];
+
+            function setupAudioGraph() {
+                if (initialized || typeof Tone === 'undefined') return;
+
+                masterFilter = new Tone.Filter({
+                    type: 'lowpass',
+                    frequency: 1450,
+                    rolloff: -24,
+                    Q: 0.7
+                }).toDestination();
+
+                reverb = new Tone.Reverb({ decay: 4.2, wet: 0.42 }).connect(masterFilter);
+                delay = new Tone.PingPongDelay({ delayTime: '8n.', feedback: 0.28, wet: 0.24 }).connect(reverb);
+
+                leadSynth = new Tone.PolySynth(Tone.Synth, {
+                    maxPolyphony: 6,
+                    oscillator: { type: 'triangle' },
+                    envelope: { attack: 0.04, decay: 0.65, sustain: 0.18, release: 1.4 },
+                    volume: -8
+                }).connect(delay);
+
+                padSynth = new Tone.PolySynth(Tone.Synth, {
+                    maxPolyphony: 6,
+                    oscillator: { type: 'sine' },
+                    envelope: { attack: 0.85, decay: 0.9, sustain: 0.65, release: 2.2 },
+                    volume: -16
+                }).connect(reverb);
+
+                bassSynth = new Tone.MonoSynth({
+                    oscillator: { type: 'sine' },
+                    filter: { Q: 1, type: 'lowpass', rolloff: -12 },
+                    envelope: { attack: 0.03, decay: 0.45, sustain: 0.25, release: 0.9 },
+                    filterEnvelope: { attack: 0.02, decay: 0.3, sustain: 0.2, baseFrequency: 95, octaves: 1.8 },
+                    volume: -9
+                }).connect(masterFilter);
+
+                pulseSynth = new Tone.MembraneSynth({
+                    pitchDecay: 0.03,
+                    octaves: 2.2,
+                    oscillator: { type: 'sine' },
+                    envelope: { attack: 0.005, decay: 0.18, sustain: 0, release: 0.15 },
+                    volume: -18
+                }).connect(reverb);
+
+                Tone.Transport.bpm.value = 90;
+                initialized = true;
+            }
+
+            function spawnIceChinkVisual(nx, nz, colorObj) {
+                if (!topColorData || !audioProjectionsGroup) return;
+
+                const s = TerrainMath.sampleGlacier(nx, nz);
+                const wx = nx * HALF_SIZE;
+                const wz = nz * HALF_SIZE;
+                const wy = s.y;
+
+                // 1. Register surface ice chink illumination
+                activeChinks.push({
+                    nx,
+                    nz,
+                    radius: 0.24 + Math.random() * 0.1,
+                    color: colorObj.clone(),
+                    life: 1.0,
+                    decay: 0.72
+                });
+
+                // 2. Vertical projection beam + expanding layer intersection rings
+                const beamGroup = new THREE.Group();
+                beamGroup.position.set(wx, 0, wz);
+
+                const lineGeo = new THREE.BufferGeometry().setFromPoints([
+                    new THREE.Vector3(0, -4.1, 0),
+                    new THREE.Vector3(0, wy + 2.2, 0)
+                ]);
+                const lineMat = new THREE.LineBasicMaterial({
+                    color: colorObj,
+                    transparent: true,
+                    opacity: 0.78
+                });
+                const beamLine = new THREE.Line(lineGeo, lineMat);
+                beamGroup.add(beamLine);
+
+                // Lower strata rings only (top glacier uses the illuminated surface ice chink itself)
+                const layerOffsets = [
+                    s.y * 0.72 + 0.10 * state.explodeAmount,
+                    s.y * 0.85 - 1.95 * state.explodeAmount,
+                    -3.93 * state.explodeAmount
+                ];
+
+                const rings = [];
+                layerOffsets.forEach((ly) => {
+                    const ringGeo = new THREE.RingGeometry(0.06, 0.14, 24);
+                    ringGeo.rotateX(-Math.PI / 2);
+                    const ringMat = new THREE.MeshBasicMaterial({
+                        color: colorObj,
+                        transparent: true,
+                        opacity: 0.9,
+                        side: THREE.DoubleSide
+                    });
+                    const ring = new THREE.Mesh(ringGeo, ringMat);
+                    ring.position.y = ly;
+                    beamGroup.add(ring);
+                    rings.push(ring);
+                });
+
+                audioProjectionsGroup.add(beamGroup);
+                activeBeams.push({
+                    group: beamGroup,
+                    beamLine,
+                    rings,
+                    life: 1.0,
+                    decay: 0.78
+                });
+            }
+
+            function triggerStep(time) {
+                const bar = Math.floor(stepIndex / 16) % CHORDS.length;
+                const beatInBar = stepIndex % 16;
+                const chord = CHORDS[bar];
+
+                // Pad chord on beat 0
+                if (beatInBar === 0) {
+                    padSynth.triggerAttackRelease(chord.pad, '1m', time);
+                }
+
+                // Warm bass groove
+                if (beatInBar === 0 || beatInBar === 6 || beatInBar === 10) {
+                    bassSynth.triggerAttackRelease(chord.bass, '8n', time);
+                }
+
+                // Soft rhythmic pulse
+                if (beatInBar % 4 === 2) {
+                    pulseSynth.triggerAttackRelease('C2', '16n', time);
+                }
+
+                // Melodic glacial elevation points on syncopated steps
+                const melodicSteps = [0, 3, 6, 8, 11, 14];
+                if (melodicSteps.includes(beatInBar)) {
+                    const count = (beatInBar === 0 || beatInBar === 8) ? 2 : 1;
+                    for (let i = 0; i < count; i++) {
+                        const nx = (Math.random() * 1.45 - 0.725);
+                        const nz = (Math.random() * 1.45 - 0.725);
+                        const sample = TerrainMath.sampleGlacier(nx, nz);
+                        const normElev = Math.min(1, Math.max(0, (sample.y - 0.3) / 2.4));
+                        const noteIdx = Math.min(chord.scale.length - 1, Math.floor(normElev * chord.scale.length));
+                        const noteName = chord.scale[noteIdx];
+                        const color = NOTE_PALETTE[(stepIndex + i) % NOTE_PALETTE.length];
+
+                        leadSynth.triggerAttackRelease(noteName, '4n', time);
+                        Tone.Draw.schedule(() => {
+                            spawnIceChinkVisual(nx, nz, color);
+                        }, time);
+                    }
+                }
+
+                stepIndex++;
+            }
+
+            async function toggle() {
+                const btn = document.getElementById('btn-audio');
+                const label = document.getElementById('audio-btn-text');
+
+                if (!isPlaying) {
+                    await Tone.start();
+                    setupAudioGraph();
+                    stepIndex = 0;
+                    loopEvent = new Tone.Loop((time) => triggerStep(time), '16n').start(0);
+                    Tone.Transport.start();
+                    isPlaying = true;
+                    if (btn) btn.classList.add('active-cyan');
+                    if (label) label.textContent = 'Stop Audio';
+                    showToast('Glacial Audio & Ice Resonance Active');
+                } else {
+                    if (loopEvent) {
+                        loopEvent.stop();
+                        loopEvent.dispose();
+                        loopEvent = null;
+                    }
+                    Tone.Transport.stop();
+                    isPlaying = false;
+                    if (btn) btn.classList.remove('active-cyan');
+                    if (label) label.textContent = 'Glacial Audio';
+                    showToast('Glacial Audio Paused');
+                }
+            }
+
+            function clearVisuals() {
+                activeChinks.length = 0;
+                while (activeBeams.length > 0) {
+                    const b = activeBeams.pop();
+                    if (b.group.parent) b.group.parent.remove(b.group);
+                    b.group.traverse((obj) => {
+                        if (obj.geometry) obj.geometry.dispose();
+                        if (obj.material) obj.material.dispose();
+                    });
+                }
+                if (topColorData) {
+                    topColorData.colors.set(topColorData.baseColors);
+                    topColorData.glowColors.fill(0);
+                    topColorData.geometry.attributes.color.needsUpdate = true;
+                    topColorData.glowGeometry.attributes.color.needsUpdate = true;
+                }
+            }
+
+            function update(dt) {
+                // Update illuminated surface ice chinks
+                if (topColorData) {
+                    const { segs, geometry, glowGeometry, colors, baseColors, glowColors } = topColorData;
+
+                    if (activeChinks.length > 0) {
+                        colors.set(baseColors);
+                        glowColors.fill(0);
+
+                        for (let c = activeChinks.length - 1; c >= 0; c--) {
+                            const ch = activeChinks[c];
+                            ch.life -= dt * ch.decay;
+                            if (ch.life <= 0) {
+                                activeChinks.splice(c, 1);
+                                continue;
+                            }
+
+                            const intensity = Math.sin(ch.life * Math.PI * 0.5);
+                            const rNorm = ch.radius;
+                            const minCol = Math.max(0, Math.floor(((ch.nx - rNorm) * 0.5 + 0.5) * segs));
+                            const maxCol = Math.min(segs, Math.ceil(((ch.nx + rNorm) * 0.5 + 0.5) * segs));
+                            const minRow = Math.max(0, Math.floor(((ch.nz - rNorm) * 0.5 + 0.5) * segs));
+                            const maxRow = Math.min(segs, Math.ceil(((ch.nz + rNorm) * 0.5 + 0.5) * segs));
+
+                            const rowLen = segs + 1;
+                            for (let r = minRow; r <= maxRow; r++) {
+                                const nz = (r / segs) * 2 - 1;
+                                for (let col = minCol; col <= maxCol; col++) {
+                                    const nx = (col / segs) * 2 - 1;
+                                    const d = Math.hypot(nx - ch.nx, nz - ch.nz);
+                                    const jagged = 1 + TerrainMath.noise2D(nx * 18, nz * 18) * 0.35;
+                                    if (d < rNorm * jagged) {
+                                        const falloff = Math.pow(1 - d / (rNorm * jagged), 0.75) * intensity;
+                                        const p3 = (r * rowLen + col) * 3;
+                                        colors[p3]     = colors[p3] * (1 - falloff * 0.85) + ch.color.r * falloff * 0.95;
+                                        colors[p3 + 1] = colors[p3 + 1] * (1 - falloff * 0.85) + ch.color.g * falloff * 0.95;
+                                        colors[p3 + 2] = colors[p3 + 2] * (1 - falloff * 0.85) + ch.color.b * falloff * 0.95;
+
+                                        glowColors[p3]     = Math.min(1, glowColors[p3] + ch.color.r * falloff);
+                                        glowColors[p3 + 1] = Math.min(1, glowColors[p3 + 1] + ch.color.g * falloff);
+                                        glowColors[p3 + 2] = Math.min(1, glowColors[p3 + 2] + ch.color.b * falloff);
+                                    }
+                                }
+                            }
+                        }
+
+                        geometry.attributes.color.needsUpdate = true;
+                        glowGeometry.attributes.color.needsUpdate = true;
+                    }
+                }
+
+                // Update vertical projection beams & layer rings
+                for (let i = activeBeams.length - 1; i >= 0; i--) {
+                    const b = activeBeams[i];
+                    b.life -= dt * b.decay;
+                    if (b.life <= 0) {
+                        if (b.group.parent) b.group.parent.remove(b.group);
+                        b.group.traverse((obj) => {
+                            if (obj.geometry) obj.geometry.dispose();
+                            if (obj.material) obj.material.dispose();
+                        });
+                        activeBeams.splice(i, 1);
+                        continue;
+                    }
+
+                    b.beamLine.material.opacity = b.life * 0.72;
+                    const scale = 1 + (1 - b.life) * 2.8;
+                    b.rings.forEach((ring) => {
+                        ring.scale.set(scale, 1, scale);
+                        ring.material.opacity = b.life * 0.85;
+                    });
+                }
+            }
+
+            return { toggle, update, clearVisuals };
+        })();
+
+        // ----------------------------------------------------------------------------
+        // 5. RIGHT-SIDE FLOATING SCHEMATIC COMPONENTS & ISOLATED 3D CHUNK VIEWER
+        // ----------------------------------------------------------------------------
+        const SchematicInspector = (() => {
+            const stackEl = document.getElementById('schematic-floating-stack');
+            const kickerEl = document.getElementById('schematic-kicker');
+            const titleEl = document.getElementById('schematic-section-title');
+            const pillsEl = document.getElementById('schematic-section-pills');
+            const metricsEl = document.getElementById('schematic-metrics');
+            const stagesEl = document.getElementById('schematic-stages-grid');
+            const stageDetailEl = document.getElementById('schematic-stage-detail');
+            const previewContainer = document.getElementById('chunk-preview-container');
+
+            // Dedicated mini Three.js scene for the isolated glacier chunk floating on the right
+            let miniScene = null;
+            let miniCamera = null;
+            let miniRenderer = null;
+            let chunkGroup = null;
+            let chunkRotY = 0.65;
+            let chunkRotX = 0.25;
+            let chunkEntryScale = 0.01;
+            let isDraggingChunk = false;
+            let lastDragX = 0;
+            let lastDragY = 0;
+
+            const STAGE_DEFS = [
+                {
+                    code: '01 · PLAN',
+                    label: 'Stratigraphy',
+                    desc: 'Orthogonal ice core survey matrix mapping elevation contours, shear fracture planes, and subsurface bedrock depth.',
+                    svg: `<svg viewBox="0 0 80 44" class="w-full h-7 stroke-slate-700 fill-none" stroke-width="1.1">
+                            <path d="M16 36 L26 11 L58 9 L66 34 Z" stroke="#334155"/>
+                            <path d="M21 24 L62 22 M36 10 L32 35 M48 10 L49 34" stroke="#64748b" stroke-dasharray="2 1.5"/>
+                            <circle cx="36" cy="23" r="2.2" fill="#06b6d4" stroke="none"/>
+                            <circle cx="48" cy="22" r="2.2" fill="#0f172a" stroke="none"/>
+                          </svg>`
+                },
+                {
+                    code: '02 · SECTION',
+                    label: 'Ice Profile',
+                    desc: 'Cross-sectional cut isolating the crystalline glacial ice wedge from dense dark basalt strata beneath.',
+                    svg: `<svg viewBox="0 0 80 44" class="w-full h-7 stroke-slate-700 fill-none" stroke-width="1.1">
+                            <path d="M12 32 L26 14 L42 22 L56 12 L68 32 Z" fill="#cbd5e1" fill-opacity="0.45" stroke="#334155"/>
+                            <path d="M26 14 L42 22 L56 12 L48 25 L32 25 Z" fill="#bae6fd" fill-opacity="0.75" stroke="#0284c7"/>
+                            <line x1="10" y1="32" x2="70" y2="32" stroke="#475569"/>
+                          </svg>`
+                },
+                {
+                    code: '03 · HYDRO',
+                    label: 'Melt Vector',
+                    desc: 'Sub-glacial drainage channels and micro-crevasse runoff vectors computed from local slope gradients.',
+                    svg: `<svg viewBox="0 0 80 44" class="w-full h-7 stroke-slate-700 fill-none" stroke-width="1.1">
+                            <path d="M14 14 Q36 20 66 16" stroke="#06b6d4" stroke-width="1.4"/>
+                            <path d="M24 28 Q42 22 64 31" stroke="#0284c7" stroke-width="1.2"/>
+                            <path d="M36 18 L44 26 M48 17 L54 27" stroke="#64748b" stroke-dasharray="1.5 1.5"/>
+                          </svg>`
+                }
+            ];
+
+            function initMiniViewer() {
+                if (miniRenderer || !previewContainer) return;
+
+                miniScene = new THREE.Scene();
+
+                const w = previewContainer.clientWidth || 340;
+                const h = previewContainer.clientHeight || 205;
+                miniCamera = new THREE.PerspectiveCamera(34, w / h, 0.1, 40);
+                miniCamera.position.set(0, 2.25, 3.25);
+                miniCamera.lookAt(0, 0.25, 0);
+
+                // Transparent alpha renderer so the isolated 3D chunk floats directly on the canvas
+                miniRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                miniRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+                miniRenderer.setSize(w, h);
+                miniRenderer.setClearColor(0x000000, 0);
+                miniRenderer.outputEncoding = THREE.sRGBEncoding;
+                previewContainer.appendChild(miniRenderer.domElement);
+
+                const hemi = new THREE.HemisphereLight(0xffffff, 0xcbd5e1, 0.95);
+                miniScene.add(hemi);
+
+                const key = new THREE.DirectionalLight(0xffffff, 1.05);
+                key.position.set(4, 7, 5);
+                miniScene.add(key);
+
+                const rim = new THREE.DirectionalLight(0x67e8f9, 0.5);
+                rim.position.set(-5, 3, -4);
+                miniScene.add(rim);
+
+                chunkGroup = new THREE.Group();
+                miniScene.add(chunkGroup);
+
+                // Pointer drag inside the floating isolated chunk
+                const dom = miniRenderer.domElement;
+                dom.addEventListener('mousedown', (e) => {
+                    isDraggingChunk = true;
+                    lastDragX = e.clientX;
+                    lastDragY = e.clientY;
+                });
+                window.addEventListener('mousemove', (e) => {
+                    if (!isDraggingChunk) return;
+                    chunkRotY += (e.clientX - lastDragX) * 0.014;
+                    chunkRotX = Math.max(-0.45, Math.min(0.65, chunkRotX + (e.clientY - lastDragY) * 0.01));
+                    lastDragX = e.clientX;
+                    lastDragY = e.clientY;
+                });
+                window.addEventListener('mouseup', () => {
+                    isDraggingChunk = false;
+                });
+
+                dom.addEventListener('touchstart', (e) => {
+                    if (e.touches.length === 1) {
+                        isDraggingChunk = true;
+                        lastDragX = e.touches[0].clientX;
+                        lastDragY = e.touches[0].clientY;
+                    }
+                }, { passive: true });
+                dom.addEventListener('touchmove', (e) => {
+                    if (!isDraggingChunk || e.touches.length !== 1) return;
+                    chunkRotY += (e.touches[0].clientX - lastDragX) * 0.014;
+                    chunkRotX = Math.max(-0.45, Math.min(0.65, chunkRotX + (e.touches[0].clientY - lastDragY) * 0.01));
+                    lastDragX = e.touches[0].clientX;
+                    lastDragY = e.touches[0].clientY;
+                }, { passive: true });
+                dom.addEventListener('touchend', () => {
+                    isDraggingChunk = false;
+                });
+            }
+
+            /**
+             * Extracts a crisp, solid geological core block centered on the clicked
+             * glacier point (nx, nz), complete with sculpted surface relief, solid
+             * cut-away bedrock walls, and an architectural base datum grid.
+             */
+            function buildIsolatedChunk(sec) {
+                initMiniViewer();
+                if (!chunkGroup) return;
+
+                while (chunkGroup.children.length > 0) {
+                    const child = chunkGroup.children[0];
+                    if (child.geometry) child.geometry.dispose();
+                    if (child.material) child.material.dispose();
+                    chunkGroup.remove(child);
+                }
+
+                chunkEntryScale = 0.72;
+
+                const centerNx = sec.nx !== undefined ? sec.nx : (sec.localPos.x / HALF_SIZE);
+                const centerNz = sec.nz !== undefined ? sec.nz : (sec.localPos.z / HALF_SIZE);
+                const patchSpan = 0.28;
+                const blockSize = 1.65;
+                const segs = 44;
+
+                const geo = new THREE.PlaneGeometry(blockSize, blockSize, segs, segs);
+                geo.rotateX(-Math.PI / 2);
+
+                const pos = geo.attributes.position;
+                const colors = new Float32Array(pos.count * 3);
+
+                const cBasaltDark = new THREE.Color('#232c36');
+                const cBasaltMid  = new THREE.Color('#3c4b5c');
+                const cSlateLight = new THREE.Color('#78899c');
+                const cSnowWhite  = new THREE.Color('#eef4f8');
+                const cIceCyan    = new THREE.Color('#80d8ea');
+                const cIceDeep    = new THREE.Color('#47a8bd');
+                const tmpColor    = new THREE.Color();
+
+                let minY = Infinity;
+                let maxY = -Infinity;
+                let sumY = 0;
+                let sumIce = 0;
+
+                const sampledHeights = new Float32Array(pos.count);
+                for (let i = 0; i < pos.count; i++) {
+                    const u = (pos.getX(i) / (blockSize * 0.5));
+                    const v = (pos.getZ(i) / (blockSize * 0.5));
+                    const nx = Math.max(-1, Math.min(1, centerNx + u * patchSpan));
+                    const nz = Math.max(-1, Math.min(1, centerNz + v * patchSpan));
+                    const s = TerrainMath.sampleGlacier(nx, nz);
+
+                    sampledHeights[i] = s.y;
+                    if (s.y < minY) minY = s.y;
+                    if (s.y > maxY) maxY = s.y;
+                    sumY += s.y;
+                    sumIce += s.glacier;
+                }
+
+                const baseFloor = -0.35;
+                const yOffset = minY - 0.32;
+
+                for (let i = 0; i < pos.count; i++) {
+                    const u = (pos.getX(i) / (blockSize * 0.5));
+                    const v = (pos.getZ(i) / (blockSize * 0.5));
+                    const nx = Math.max(-1, Math.min(1, centerNx + u * patchSpan));
+                    const nz = Math.max(-1, Math.min(1, centerNz + v * patchSpan));
+                    const s = TerrainMath.sampleGlacier(nx, nz);
+
+                    const localY = Math.max(0.08, (sampledHeights[i] - yOffset) * 1.15);
+                    pos.setY(i, localY);
+
+                    const elevNorm = Math.min(1, Math.max(0, (s.y - 0.25) / 2.65));
+                    const rockNoise = TerrainMath.fbm(nx * 10 + 2.1, nz * 10 - 1.3, 3);
+
+                    tmpColor.copy(cBasaltDark).lerp(cBasaltMid, Math.min(1, Math.max(0, elevNorm * 0.75 + rockNoise * 0.55)));
+                    const snowFactor = Math.min(1, Math.max(0, (elevNorm - 0.42) * 1.9 + rockNoise * 0.35));
+                    tmpColor.lerp(cSlateLight, snowFactor * 0.45);
+                    tmpColor.lerp(cSnowWhite, Math.pow(snowFactor, 1.55) * 0.88);
+
+                    if (s.glacier > 0.14) {
+                        const iceStrength = Math.min(1, (s.glacier - 0.14) * 1.45);
+                        const iceTint = new THREE.Color().copy(cIceDeep).lerp(cIceCyan, Math.min(1, Math.max(0, 0.45 + rockNoise * 0.75)));
+                        tmpColor.lerp(iceTint, iceStrength * 0.86);
+                        if (s.glacier > 0.55) {
+                            tmpColor.lerp(cSnowWhite, (s.glacier - 0.55) * 0.55);
+                        }
+                    }
+
+                    colors[i * 3]     = tmpColor.r;
+                    colors[i * 3 + 1] = tmpColor.g;
+                    colors[i * 3 + 2] = tmpColor.b;
+                }
+
+                geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+                geo.computeVertexNormals();
+
+                const topMat = new THREE.MeshStandardMaterial({
+                    vertexColors: true,
+                    roughness: 0.72,
+                    metalness: 0.08,
+                    side: THREE.DoubleSide
+                });
+                const topMesh = new THREE.Mesh(geo, topMat);
+                chunkGroup.add(topMesh);
+
+                // Solid cut-away bedrock walls around all 4 sides of the chunk
+                const skirtVerts = [];
+                const rowLen = segs + 1;
+                const addWallEdge = (idxA, idxB) => {
+                    const ax = pos.getX(idxA), ay = pos.getY(idxA), az = pos.getZ(idxA);
+                    const bx = pos.getX(idxB), by = pos.getY(idxB), bz = pos.getZ(idxB);
+                    skirtVerts.push(ax, ay, az, ax, baseFloor, az, bx, by, bz);
+                    skirtVerts.push(bx, by, bz, ax, baseFloor, az, bx, baseFloor, bz);
+                };
+
+                for (let c = 0; c < segs; c++) {
+                    addWallEdge(c, c + 1);
+                    addWallEdge(segs * rowLen + c + 1, segs * rowLen + c);
+                }
+                for (let r = 0; r < segs; r++) {
+                    addWallEdge((r + 1) * rowLen, r * rowLen);
+                    addWallEdge(r * rowLen + segs, (r + 1) * rowLen + segs);
+                }
+
+                const skirtGeo = new THREE.BufferGeometry();
+                skirtGeo.setAttribute('position', new THREE.Float32BufferAttribute(skirtVerts, 3));
+                skirtGeo.computeVertexNormals();
+                const skirtMat = new THREE.MeshStandardMaterial({
+                    color: 0x334155,
+                    roughness: 0.85,
+                    metalness: 0.05,
+                    side: THREE.DoubleSide
+                });
+                const skirtMesh = new THREE.Mesh(skirtGeo, skirtMat);
+                chunkGroup.add(skirtMesh);
+
+                // Architectural datum grid underneath the isolated specimen block
+                const grid = new THREE.GridHelper(2.25, 10, 0x06b6d4, 0x94a3b8);
+                grid.position.y = baseFloor - 0.02;
+                grid.material.transparent = true;
+                grid.material.opacity = 0.55;
+                chunkGroup.add(grid);
+
+                // Floating telemetry cards
+                const avgElevM = Math.round(2800 + (sumY / pos.count) * 520);
+                const icePct = Math.min(98, Math.max(4, Math.round((sumIce / pos.count) * 115)));
+                const reliefM = Math.max(18, Math.round((maxY - minY) * 520));
+
+                metricsEl.innerHTML = `
+                    <div class="hud-panel rounded-xl p-2">
+                        <div class="text-[8px] font-medium uppercase tracking-wider text-slate-400">Elevation</div>
+                        <div class="text-xs font-semibold text-slate-800 mt-0.5">${avgElevM} m</div>
+                    </div>
+                    <div class="hud-panel rounded-xl p-2">
+                        <div class="text-[8px] font-medium uppercase tracking-wider text-slate-400">Ice Cover</div>
+                        <div class="text-xs font-semibold text-cyan-700 mt-0.5">${icePct}%</div>
+                    </div>
+                    <div class="hud-panel rounded-xl p-2">
+                        <div class="text-[8px] font-medium uppercase tracking-wider text-slate-400">Local Relief</div>
+                        <div class="text-xs font-semibold text-slate-800 mt-0.5">Δ ${reliefM} m</div>
+                    </div>
+                `;
+            }
+
+            function renderFloatingUI(sections, activeIdx) {
+                const sec = sections[activeIdx];
+                if (!sec) return;
+
+                kickerEl.textContent = `${sec.sub} · Specimen 0${activeIdx + 1}`;
+                titleEl.textContent = sec.title;
+
+                pillsEl.innerHTML = sections.map((s, idx) => `
+                    <button data-sec-idx="${idx}" class="sec-jump-btn px-2 py-1 rounded-lg text-[9px] font-semibold tracking-wider uppercase whitespace-nowrap transition-all ${
+                        idx === activeIdx
+                            ? 'bg-slate-800 text-white shadow-sm'
+                            : 'hud-panel text-slate-600 hover:text-slate-900'
+                    }">
+                        ${s.title}
+                    </button>
+                `).join('');
+
+                pillsEl.querySelectorAll('.sec-jump-btn').forEach((btn) => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        openSection(parseInt(btn.dataset.secIdx, 10));
+                    });
+                });
+
+                stagesEl.innerHTML = STAGE_DEFS.map((st, idx) => `
+                    <button data-stage-idx="${idx}" class="stage-card rounded-xl p-1.5 text-left flex flex-col gap-1 ${
+                        idx === state.schematic.stageIndex ? 'active' : ''
+                    }">
+                        <span class="text-[8px] font-semibold tracking-wider text-cyan-700">${st.code}</span>
+                        <div class="bg-white/90 rounded-lg border border-slate-200/70 py-0.5 px-1">
+                            ${st.svg}
+                        </div>
+                        <span class="text-[9px] font-medium text-slate-700 truncate">${st.label}</span>
+                    </button>
+                `).join('');
+
+                stagesEl.querySelectorAll('.stage-card').forEach((card) => {
+                    card.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        setStage(parseInt(card.dataset.stageIdx, 10));
+                    });
+                });
+
+                stageDetailEl.textContent = STAGE_DEFS[state.schematic.stageIndex].desc;
+            }
+
+            function setStage(stageIdx) {
+                state.schematic.stageIndex = stageIdx;
+                stagesEl.querySelectorAll('.stage-card').forEach((card, idx) => {
+                    card.classList.toggle('active', idx === stageIdx);
+                });
+                stageDetailEl.textContent = STAGE_DEFS[stageIdx].desc;
+                chunkRotY += 0.55;
+            }
+
+            function openSection(sectionIdx) {
+                const sections = LabelManager.getSections();
+                const sec = sections[sectionIdx];
+                if (!sec) return;
+
+                if (state.inceptionOrbit) {
+                    state.inceptionOrbit = false;
+                    state.cam.targetRoll = 0;
+                }
+
+                state.schematic.active = true;
+                state.schematic.sectionIndex = sectionIdx;
+                state.schematic.stageIndex = 0;
+
+                // Smoothly zoom the camera onto the selected glacier landmark, offset slightly
+                // so the zoomed glacier spot sits cleanly on the left while the floating
+                // schematic components animate in on the right
+                const grp = sec.getGroup();
+                const worldPt = sec.localPos.clone();
+                if (grp) {
+                    grp.updateMatrixWorld(true);
+                    grp.localToWorld(worldPt);
+                }
+
+                const targetTheta = Math.atan2(worldPt.x, worldPt.z) + 0.38;
+                const rightVecX = Math.cos(targetTheta);
+                const rightVecZ = -Math.sin(targetTheta);
+                const lateralOffset = window.innerWidth >= 640 ? 1.55 : 0.45;
+
+                state.cam.targetLookX = worldPt.x + rightVecX * lateralOffset;
+                state.cam.targetLookY = worldPt.y - 0.15;
+                state.cam.targetLookZ = worldPt.z + rightVecZ * lateralOffset;
+                state.cam.targetRadius = 7.4;
+                state.cam.targetPhi = Math.PI * 0.34;
+                state.cam.targetTheta = targetTheta;
+                state.cam.targetRoll = 0;
+
+                LabelManager.setSelectedIndex(sectionIdx);
+                renderFloatingUI(sections, sectionIdx);
+                stackEl.classList.add('visible');
+
+                requestAnimationFrame(() => {
+                    if (miniRenderer && previewContainer) {
+                        const w = previewContainer.clientWidth || 340;
+                        const h = previewContainer.clientHeight || 205;
+                        miniCamera.aspect = w / h;
+                        miniCamera.updateProjectionMatrix();
+                        miniRenderer.setSize(w, h);
+                    }
+                    buildIsolatedChunk(sec);
+                });
+            }
+
+            function close() {
+                if (!state.schematic.active) return;
+                state.schematic.active = false;
+                state.schematic.sectionIndex = -1;
+                LabelManager.setSelectedIndex(-1);
+                stackEl.classList.remove('visible');
+
+                // Smoothly zoom camera back out to frame the whole extended-layers island
+                state.cam.targetRadius = 18.2;
+                state.cam.targetLookX = 0;
+                state.cam.targetLookY = -0.55;
+                state.cam.targetLookZ = 0;
+                state.cam.targetPhi = Math.PI * 0.35;
+                state.cam.targetTheta = Math.PI * 0.25;
+                state.cam.targetRoll = 0;
+            }
+
+            function update(dt) {
+                if (!state.schematic.active || !miniRenderer || !miniScene || !miniCamera) return;
+                if (chunkGroup) {
+                    if (!isDraggingChunk) {
+                        chunkRotY += dt * 0.38;
+                    }
+                    chunkEntryScale += (1 - chunkEntryScale) * Math.min(1, dt * 8);
+                    chunkGroup.scale.setScalar(chunkEntryScale);
+                    chunkGroup.rotation.y = chunkRotY;
+                    chunkGroup.rotation.x = chunkRotX;
+                }
+                miniRenderer.render(miniScene, miniCamera);
+            }
+
+            return { openSection, close, update, setStage };
+        })();
+
+        // ----------------------------------------------------------------------------
+        // 6. FLOATING ARCHITECTURAL TARGETING BOXES (CLICKABLE GLACIER CALLOUTS)
+        // ----------------------------------------------------------------------------
+        const LabelManager = (() => {
+            const overlay = document.getElementById('labels-overlay');
+            const entries = [];
+            let currentSpecs = [];
+            let selectedIdx = -1;
+            const projVec = new THREE.Vector3();
+
+            function getSections() {
+                return currentSpecs;
+            }
+
+            function setSelectedIndex(idx) {
+                selectedIdx = idx;
+                entries.forEach((entry, i) => {
+                    entry.el.classList.toggle('selected', i === idx);
+                });
+            }
+
+            function rebuild() {
+                overlay.innerHTML = '';
+                entries.length = 0;
+                selectedIdx = -1;
+
+                // Scan terrain to locate authentic 3D landmarks
+                let summit = { x: 0, y: -99, z: 0, nx: 0, nz: 0 };
+                let crevasse = { x: 0, y: 0, z: 0, nx: 0, nz: 0, g: -1 };
+                let ridge = { x: 0, y: -99, z: 0, nx: 0, nz: 0 };
+
+                for (let iz = -8; iz <= 8; iz++) {
+                    for (let ix = -8; ix <= 8; ix++) {
+                        const nx = ix / 10;
+                        const nz = iz / 10;
+                        const s = TerrainMath.sampleGlacier(nx, nz);
+                        const wx = nx * HALF_SIZE;
+                        const wz = nz * HALF_SIZE;
+
+                        if (s.y > summit.y) {
+                            summit = { x: wx, y: s.y, z: wz, nx, nz };
+                        }
+                        if (s.glacier > crevasse.g && Math.abs(nx) < 0.65 && Math.abs(nz) < 0.65) {
+                            crevasse = { x: wx, y: s.y, z: wz, nx, nz, g: s.glacier };
+                        }
+                        if (nx > 0.25 && s.y > ridge.y && Math.hypot(wx - summit.x, wz - summit.z) > 1.8) {
+                            ridge = { x: wx, y: s.y, z: wz, nx, nz };
+                        }
+                    }
+                }
+
+                const elevMeters = Math.round(2800 + summit.y * 520);
+
+                currentSpecs = [
+                    {
+                        title: 'Alpine Summit',
+                        sub: `${elevMeters}m`,
+                        nx: summit.nx,
+                        nz: summit.nz,
+                        localPos: new THREE.Vector3(summit.x, summit.y + 0.08, summit.z),
+                        getGroup: () => topLayerGroup,
+                        explodedOnly: false
+                    },
+                    {
+                        title: 'Glacial Crevasse',
+                        sub: 'Ice Channel',
+                        nx: crevasse.nx,
+                        nz: crevasse.nz,
+                        localPos: new THREE.Vector3(crevasse.x, crevasse.y + 0.08, crevasse.z),
+                        getGroup: () => topLayerGroup,
+                        explodedOnly: false
+                    },
+                    {
+                        title: 'Basalt Ridge',
+                        sub: 'Fracture Zone',
+                        nx: ridge.nx,
+                        nz: ridge.nz,
+                        localPos: new THREE.Vector3(ridge.x, ridge.y + 0.08, ridge.z),
+                        getGroup: () => topLayerGroup,
+                        explodedOnly: false
+                    },
+                    {
+                        title: 'Smoothed NURBS',
+                        sub: 'Layer 02',
+                        nx: -0.78,
+                        nz: 0.1,
+                        localPos: new THREE.Vector3(-HALF_SIZE, TerrainMath.sampleGlacier(-1, 0.1).y * 0.72, 0.1 * HALF_SIZE),
+                        getGroup: () => contourLayerGroup,
+                        explodedOnly: true
+                    },
+                    {
+                        title: 'LiDAR Points',
+                        sub: 'Layer 03',
+                        nx: -0.78,
+                        nz: 0.2,
+                        localPos: new THREE.Vector3(-HALF_SIZE, TerrainMath.sampleGlacier(-1, 0.2).y * 0.85, 0.2 * HALF_SIZE),
+                        getGroup: () => pointLayerGroup,
+                        explodedOnly: true
+                    },
+                    {
+                        title: 'B&W Heightmap',
+                        sub: 'Hydrology',
+                        nx: -0.78,
+                        nz: 0.25,
+                        localPos: new THREE.Vector3(-HALF_SIZE, 0.05, 0.25 * HALF_SIZE),
+                        getGroup: () => baseLayerGroup,
+                        explodedOnly: true
+                    }
+                ];
+
+                currentSpecs.forEach((spec, idx) => {
+                    const el = document.createElement('div');
+                    el.className = 'glacier-label';
+                    el.title = `Click to inspect ${spec.title} chunk`;
+                    el.innerHTML = `
+                        <div class="glacier-box"></div>
+                        <div class="glacier-leader"></div>
+                        <div class="glacier-tag">
+                            <span>${spec.title}</span>
+                            <span class="glacier-label-sub">${spec.sub}</span>
+                        </div>
+                    `;
+                    el.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        SchematicInspector.openSection(idx);
+                    });
+                    overlay.appendChild(el);
+                    entries.push({ el, spec });
+                });
+            }
+
+            function update() {
+                if (!camera) return;
+                const w = window.innerWidth;
+                const h = window.innerHeight;
+                const isMobile = w < 640;
+
+                for (let i = 0; i < entries.length; i++) {
+                    const { el, spec } = entries[i];
+                    const grp = spec.getGroup();
+
+                    if (!grp || !grp.visible || (spec.explodedOnly && state.explodeAmount < 0.35)) {
+                        el.style.opacity = '0';
+                        el.style.pointerEvents = 'none';
+                        continue;
+                    }
+
+                    if (isMobile && i === 2) {
+                        el.style.opacity = '0';
+                        el.style.pointerEvents = 'none';
+                        continue;
+                    }
+
+                    projVec.copy(spec.localPos);
+                    grp.localToWorld(projVec);
+                    projVec.project(camera);
+
+                    if (projVec.z > 1) {
+                        el.style.opacity = '0';
+                        el.style.pointerEvents = 'none';
+                        continue;
+                    }
+
+                    const sx = (projVec.x * 0.5 + 0.5) * w;
+                    const sy = (-projVec.y * 0.5 + 0.5) * h;
+
+                    if (sx < -40 || sx > w + 40 || sy < -40 || sy > h + 40) {
+                        el.style.opacity = '0';
+                        el.style.pointerEvents = 'none';
+                        continue;
+                    }
+
+                    el.style.opacity = '1';
+                    el.style.pointerEvents = 'auto';
+                    el.style.transform = `translate3d(${sx.toFixed(1)}px, ${sy.toFixed(1)}px, 0)`;
+                }
+            }
+
+            return { rebuild, update, getSections, setSelectedIndex };
+        })();
+
+        // ----------------------------------------------------------------------------
+        // 4. PROCEDURAL GEOMETRY BUILDERS FOR ALL 4 GEOLOGICAL LAYERS
+        // ----------------------------------------------------------------------------
+
+        /**
+         * Layer 1: Sculpted Textured Glacial Rock Formation
+         * Double-sided surface (no detached flat slab underneath) with vertex colors
+         * matching dark basalt ridges, sunlit alpine snow, and icy cyan glacier channels.
+         */
+        function buildTopLayer() {
+            const group = new THREE.Group();
+            const segs = 128;
+            const geo = new THREE.PlaneGeometry(ISLAND_SIZE, ISLAND_SIZE, segs, segs);
+            geo.rotateX(-Math.PI / 2);
+
+            const pos = geo.attributes.position;
+            const count = pos.count;
+            const colors = new Float32Array(count * 3);
+            const baseColors = new Float32Array(count * 3);
+            const glowColors = new Float32Array(count * 3);
+
+            const cBasaltDark = new THREE.Color('#232c36');
+            const cBasaltMid  = new THREE.Color('#3c4b5c');
+            const cSlateLight = new THREE.Color('#78899c');
+            const cSnowWhite  = new THREE.Color('#eef4f8');
+            const cIceCyan    = new THREE.Color('#80d8ea');
+            const cIceDeep    = new THREE.Color('#47a8bd');
+            const tmpColor    = new THREE.Color();
+
+            for (let i = 0; i < count; i++) {
+                const x = pos.getX(i);
+                const z = pos.getZ(i);
+                const nx = x / HALF_SIZE;
+                const nz = z / HALF_SIZE;
+
+                const s = TerrainMath.sampleGlacier(nx, nz);
+                pos.setY(i, s.y);
+
+                // Compute architectural basalt / snow / glacial ice color
+                const elevNorm = Math.min(1, Math.max(0, (s.y - 0.25) / 2.65));
+                const rockNoise = TerrainMath.fbm(nx * 10 + 2.1, nz * 10 - 1.3, 3);
+
+                // Base dark basalt to mid slate
+                tmpColor.copy(cBasaltDark).lerp(cBasaltMid, Math.min(1, Math.max(0, elevNorm * 0.75 + rockNoise * 0.55)));
+
+                // Alpine snow accumulation on high ridges and gentle high slopes
+                const snowFactor = Math.min(1, Math.max(0, (elevNorm - 0.42) * 1.9 + rockNoise * 0.35));
+                tmpColor.lerp(cSlateLight, snowFactor * 0.45);
+                tmpColor.lerp(cSnowWhite, Math.pow(snowFactor, 1.55) * 0.88);
+
+                // Glacial cyan ice channels carved through the valleys
+                if (s.glacier > 0.14) {
+                    const iceStrength = Math.min(1, (s.glacier - 0.14) * 1.45);
+                    const iceTint = new THREE.Color().copy(cIceDeep).lerp(cIceCyan, Math.min(1, Math.max(0, 0.45 + rockNoise * 0.75)));
+                    tmpColor.lerp(iceTint, iceStrength * 0.86);
+                    // Crisp bright snow edges along glacier rim
+                    if (s.glacier > 0.55) {
+                        tmpColor.lerp(cSnowWhite, (s.glacier - 0.55) * 0.55);
+                    }
+                }
+
+                const p3 = i * 3;
+                colors[p3]     = tmpColor.r;
+                colors[p3 + 1] = tmpColor.g;
+                colors[p3 + 2] = tmpColor.b;
+
+                baseColors[p3]     = tmpColor.r;
+                baseColors[p3 + 1] = tmpColor.g;
+                baseColors[p3 + 2] = tmpColor.b;
+            }
+
+            geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            geo.computeVertexNormals();
+
+            const mat = new THREE.MeshStandardMaterial({
+                vertexColors: true,
+                roughness: 0.76,
+                metalness: 0.08,
+                flatShading: false,
+                side: THREE.DoubleSide
+            });
+
+            const terrainMesh = new THREE.Mesh(geo, mat);
+            terrainMesh.name = 'glacier-top-mesh';
+            group.add(terrainMesh);
+            clickableMeshes.push(terrainMesh);
+
+            // Additive backlit ice shimmer layer for subtle surface glow around lit chinks
+            const glowGeo = geo.clone();
+            glowGeo.setAttribute('color', new THREE.BufferAttribute(glowColors, 3));
+            const glowMat = new THREE.MeshBasicMaterial({
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.65,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false,
+                side: THREE.DoubleSide
+            });
+            const glowMesh = new THREE.Mesh(glowGeo, glowMat);
+            glowMesh.position.y = 0.012;
+            group.add(glowMesh);
+
+            topColorData = {
+                segs,
+                geometry: geo,
+                glowGeometry: glowGeo,
+                colors,
+                baseColors,
+                glowColors
+            };
+
+            return group;
+        }
+
+        /**
+         * Layer 2: Smoothed NURBS Surface + Crisp Topographic Contour Lines
+         */
+        function buildContourLayer() {
+            const group = new THREE.Group();
+            const segs = 76;
+            const geo = new THREE.PlaneGeometry(ISLAND_SIZE, ISLAND_SIZE, segs, segs);
+            geo.rotateX(-Math.PI / 2);
+
+            const pos = geo.attributes.position;
+            const heights = new Float32Array((segs + 1) * (segs + 1));
+
+            for (let i = 0; i < pos.count; i++) {
+                const x = pos.getX(i);
+                const z = pos.getZ(i);
+                const s = TerrainMath.sampleGlacier(x / HALF_SIZE, z / HALF_SIZE);
+                const y = s.y * 0.72;
+                pos.setY(i, y);
+                heights[i] = y;
+            }
+            geo.computeVertexNormals();
+
+            // Translucent matte architectural NURBS shell
+            const mat = new THREE.MeshStandardMaterial({
+                color: 0xdce4ec,
+                roughness: 0.85,
+                metalness: 0.02,
+                transparent: true,
+                opacity: 0.84,
+                side: THREE.DoubleSide
+            });
+            const nurbsMesh = new THREE.Mesh(geo, mat);
+            group.add(nurbsMesh);
+            clickableMeshes.push(nurbsMesh);
+
+            // Marching-squares topographic contour lines
+            const linePositions = [];
+            const rowLen = segs + 1;
+            const cellSize = ISLAND_SIZE / segs;
+
+            for (let level = 0.25; level <= 2.2; level += 0.14) {
+                for (let r = 0; r < segs; r++) {
+                    for (let c = 0; c < segs; c++) {
+                        const i0 = r * rowLen + c;
+                        const i1 = i0 + 1;
+                        const i2 = (r + 1) * rowLen + c + 1;
+                        const i3 = (r + 1) * rowLen + c;
+
+                        const h0 = heights[i0], h1 = heights[i1], h2 = heights[i2], h3 = heights[i3];
+                        const x0 = -HALF_SIZE + c * cellSize;
+                        const z0 = -HALF_SIZE + r * cellSize;
+
+                        const pts = [];
+                        const checkEdge = (ha, hb, xa, za, xb, zb) => {
+                            if ((ha < level && hb >= level) || (hb < level && ha >= level)) {
+                                const t = (level - ha) / (hb - ha);
+                                pts.push(xa + (xb - xa) * t, level + 0.015, za + (zb - za) * t);
+                            }
+                        };
+
+                        checkEdge(h0, h1, x0, z0, x0 + cellSize, z0);
+                        checkEdge(h1, h2, x0 + cellSize, z0, x0 + cellSize, z0 + cellSize);
+                        checkEdge(h2, h3, x0 + cellSize, z0 + cellSize, x0, z0 + cellSize);
+                        checkEdge(h3, h0, x0, z0 + cellSize, x0, z0);
+
+                        if (pts.length === 6) {
+                            linePositions.push(...pts);
+                        } else if (pts.length === 12) {
+                            linePositions.push(pts[0], pts[1], pts[2], pts[3], pts[4], pts[5]);
+                            linePositions.push(pts[6], pts[7], pts[8], pts[9], pts[10], pts[11]);
+                        }
+                    }
+                }
+            }
+
+            const contourGeo = new THREE.BufferGeometry();
+            contourGeo.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
+            const contourMat = new THREE.LineBasicMaterial({
+                color: 0x475569,
+                transparent: true,
+                opacity: 0.52
+            });
+            const contours = new THREE.LineSegments(contourGeo, contourMat);
+            group.add(contours);
+
+            return group;
+        }
+
+        /**
+         * Layer 3: LiDAR Point-Based Elevation Cloud
+         */
+        function buildPointLayer() {
+            const group = new THREE.Group();
+            const segs = 72;
+            const count = (segs + 1) * (segs + 1);
+            const positions = new Float32Array(count * 3);
+            const colors = new Float32Array(count * 3);
+
+            const cLow  = new THREE.Color('#334155');
+            const cMid  = new THREE.Color('#94a3b8');
+            const cHigh = new THREE.Color('#e2f1f8');
+            const tmp   = new THREE.Color();
+
+            let idx = 0;
+            for (let r = 0; r <= segs; r++) {
+                const nz = (r / segs) * 2 - 1;
+                const z = nz * HALF_SIZE;
+                for (let c = 0; c <= segs; c++) {
+                    const nx = (c / segs) * 2 - 1;
+                    const x = nx * HALF_SIZE;
+
+                    const s = TerrainMath.sampleGlacier(nx, nz);
+                    const y = s.y * 0.85 - (1 - s.glacier) * 0.15;
+
+                    positions[idx * 3]     = x;
+                    positions[idx * 3 + 1] = y;
+                    positions[idx * 3 + 2] = z;
+
+                    const t = Math.min(1, Math.max(0, (s.y - 0.2) / 2.5));
+                    if (t < 0.5) {
+                        tmp.copy(cLow).lerp(cMid, t * 2);
+                    } else {
+                        tmp.copy(cMid).lerp(cHigh, (t - 0.5) * 2);
+                    }
+                    if (s.glacier > 0.35) {
+                        tmp.lerp(new THREE.Color('#67d2e8'), (s.glacier - 0.35) * 0.7);
+                    }
+
+                    colors[idx * 3]     = tmp.r;
+                    colors[idx * 3 + 1] = tmp.g;
+                    colors[idx * 3 + 2] = tmp.b;
+                    idx++;
+                }
+            }
+
+            const geo = new THREE.BufferGeometry();
+            geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+            // Crisp soft circular dot sprite
+            const spriteCanvas = document.createElement('canvas');
+            spriteCanvas.width = 32;
+            spriteCanvas.height = 32;
+            const ctx = spriteCanvas.getContext('2d');
+            const grad = ctx.createRadialGradient(16, 16, 2, 16, 16, 15);
+            grad.addColorStop(0, 'rgba(255,255,255,1)');
+            grad.addColorStop(0.65, 'rgba(255,255,255,0.85)');
+            grad.addColorStop(1, 'rgba(255,255,255,0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 32, 32);
+            const spriteTex = new THREE.CanvasTexture(spriteCanvas);
+
+            const mat = new THREE.PointsMaterial({
+                size: 0.13,
+                map: spriteTex,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.92,
+                alphaTest: 0.05,
+                depthWrite: false
+            });
+
+            const points = new THREE.Points(geo, mat);
+            group.add(points);
+            return group;
+        }
+
+        /**
+         * Layer 4: B&W Heightmap Grid + Branching Cyan Hydrological River Networks
+         */
+        function buildBaseLayer() {
+            const group = new THREE.Group();
+
+            // 1. Procedural B&W Heightmap Texture
+            const texSize = 256;
+            const canvas = document.createElement('canvas');
+            canvas.width = texSize;
+            canvas.height = texSize;
+            const ctx = canvas.getContext('2d');
+            const imgData = ctx.createImageData(texSize, texSize);
+
+            for (let y = 0; y < texSize; y++) {
+                const nz = (y / (texSize - 1)) * 2 - 1;
+                for (let x = 0; x < texSize; x++) {
+                    const nx = (x / (texSize - 1)) * 2 - 1;
+                    const s = TerrainMath.sampleGlacier(nx, nz);
+                    const shade = Math.floor(Math.min(255, Math.max(25, ((s.y - 0.15) / 2.8) * 235 + 20)));
+                    const idx = (y * texSize + x) * 4;
+                    imgData.data[idx]     = shade;
+                    imgData.data[idx + 1] = shade;
+                    imgData.data[idx + 2] = shade;
+                    imgData.data[idx + 3] = 245;
+                }
+            }
+            ctx.putImageData(imgData, 0, 0);
+
+            const heightTex = new THREE.CanvasTexture(canvas);
+            const planeGeo = new THREE.PlaneGeometry(ISLAND_SIZE, ISLAND_SIZE);
+            planeGeo.rotateX(-Math.PI / 2);
+            const planeMat = new THREE.MeshBasicMaterial({
+                map: heightTex,
+                transparent: true,
+                opacity: 0.92,
+                side: THREE.DoubleSide
+            });
+            const planeMesh = new THREE.Mesh(planeGeo, planeMat);
+            group.add(planeMesh);
+            clickableMeshes.push(planeMesh);
+
+            // 2. Crisp architectural grid overlay
+            const grid = new THREE.GridHelper(ISLAND_SIZE, 16, 0x475569, 0x94a3b8);
+            grid.position.y = 0.012;
+            grid.material.transparent = true;
+            grid.material.opacity = 0.35;
+            group.add(grid);
+
+            // 3. Branching Cyan Hydrological Meltwater Lines radiating from the edges
+            const hydroVerts = [];
+            function addRiverBranch(startX, startZ, dirAngle, length, depth) {
+                if (depth <= 0 || length < 0.25) return;
+                let cx = startX;
+                let cz = startZ;
+                let angle = dirAngle;
+                const steps = 6;
+                const stepLen = length / steps;
+
+                for (let i = 0; i < steps; i++) {
+                    angle += TerrainMath.noise2D(cx * 1.4, cz * 1.4) * 0.55;
+                    const nx = cx + Math.cos(angle) * stepLen;
+                    const nz = cz + Math.sin(angle) * stepLen;
+                    hydroVerts.push(cx, 0.018, cz, nx, 0.018, nz);
+
+                    if (i === 2 || i === 4) {
+                        const forkSign = (i === 2 ? 1 : -1);
+                        addRiverBranch(nx, nz, angle + forkSign * (0.45 + Math.abs(TerrainMath.noise2D(nx, nz)) * 0.4), length * 0.58, depth - 1);
+                    }
+                    cx = nx;
+                    cz = nz;
+                }
+            }
+
+            // Emit meltwater channels around the 4 perimeter edges
+            for (let i = -3; i <= 3; i++) {
+                const offset = i * 0.95;
+                addRiverBranch(offset, HALF_SIZE * 0.95, Math.PI * 0.5 + i * 0.06, 2.2, 3);
+                addRiverBranch(HALF_SIZE * 0.95, offset, i * 0.06, 2.0, 3);
+                if (i % 2 === 0) {
+                    addRiverBranch(-HALF_SIZE * 0.95, offset, Math.PI + i * 0.05, 1.75, 2);
+                    addRiverBranch(offset, -HALF_SIZE * 0.95, -Math.PI * 0.5 + i * 0.05, 1.65, 2);
+                }
+            }
+
+            const hydroGeo = new THREE.BufferGeometry();
+            hydroGeo.setAttribute('position', new THREE.Float32BufferAttribute(hydroVerts, 3));
+            const hydroMat = new THREE.LineBasicMaterial({
+                color: 0x22b8cf,
+                transparent: true,
+                opacity: 0.62
+            });
+            const hydroLines = new THREE.LineSegments(hydroGeo, hydroMat);
+            group.add(hydroLines);
+
+            return group;
+        }
+
+        /**
+         * Vertical architectural corner guide lines connecting the 4 extended layers
+         */
+        function buildVerticalGuides() {
+            const verts = [];
+            const corners = [
+                [-HALF_SIZE, -HALF_SIZE],
+                [ HALF_SIZE, -HALF_SIZE],
+                [ HALF_SIZE,  HALF_SIZE],
+                [-HALF_SIZE,  HALF_SIZE]
+            ];
+
+            for (const [x, z] of corners) {
+                verts.push(x, 0, z, x, 1, z);
+            }
+
+            const geo = new THREE.BufferGeometry();
+            geo.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
+            const mat = new THREE.LineBasicMaterial({
+                color: 0x94a3b8,
+                transparent: true,
+                opacity: 0.45
+            });
+            return new THREE.LineSegments(geo, mat);
+        }
+
+        /**
+         * Subtle soft ambient shadow disk beneath the floating formation
+         */
+        function buildSoftGroundShadow() {
+            const c = document.createElement('canvas');
+            c.width = 256;
+            c.height = 256;
+            const ctx = c.getContext('2d');
+            const grad = ctx.createRadialGradient(128, 128, 12, 128, 128, 124);
+            grad.addColorStop(0, 'rgba(15, 23, 42, 0.11)');
+            grad.addColorStop(0.55, 'rgba(15, 23, 42, 0.04)');
+            grad.addColorStop(1, 'rgba(15, 23, 42, 0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 256, 256);
+
+            const tex = new THREE.CanvasTexture(c);
+            const geo = new THREE.PlaneGeometry(14, 14);
+            geo.rotateX(-Math.PI / 2);
+            const mat = new THREE.MeshBasicMaterial({
+                map: tex,
+                transparent: true,
+                depthWrite: false
+            });
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.position.y = -4.6;
+            return mesh;
+        }
+
+        // ----------------------------------------------------------------------------
+        // 7. SCENE INITIALIZATION, REGENERATION & LAYER VISIBILITY
+        // ----------------------------------------------------------------------------
+        function disposeGroup(grp) {
+            if (!grp) return;
+            grp.traverse((obj) => {
+                if (obj.geometry) obj.geometry.dispose();
+                if (obj.material) {
+                    if (Array.isArray(obj.material)) {
+                        obj.material.forEach(m => m.dispose());
+                    } else {
+                        obj.material.dispose();
+                    }
+                }
+            });
+            if (grp.parent) grp.parent.remove(grp);
+        }
+
+        function buildAllLayers() {
+            clickableMeshes = [];
+
+            disposeGroup(topLayerGroup);
+            disposeGroup(contourLayerGroup);
+            disposeGroup(pointLayerGroup);
+            disposeGroup(baseLayerGroup);
+            if (verticalGuideLines) {
+                verticalGuideLines.geometry.dispose();
+                verticalGuideLines.material.dispose();
+                if (verticalGuideLines.parent) verticalGuideLines.parent.remove(verticalGuideLines);
+            }
+
+            topLayerGroup = buildTopLayer();
+            contourLayerGroup = buildContourLayer();
+            pointLayerGroup = buildPointLayer();
+            baseLayerGroup = buildBaseLayer();
+            verticalGuideLines = buildVerticalGuides();
+
+            islandRoot.add(topLayerGroup);
+            islandRoot.add(contourLayerGroup);
+            islandRoot.add(pointLayerGroup);
+            islandRoot.add(baseLayerGroup);
+            islandRoot.add(verticalGuideLines);
+
+            applyModeVisibility();
+            LabelManager.rebuild();
+        }
+
+        function regenerateTerrain() {
+            if (state.schematic.active) {
+                SchematicInspector.close();
+            }
+            GlacialAudio.clearVisuals();
+            state.currentSeed = TerrainMath.reseed();
+            buildAllLayers();
+            showToast(`New Glacial Formation #${state.currentSeed % 10000}`);
+        }
+
+        function applyModeVisibility() {
+            topLayerGroup.visible = true;
+            contourLayerGroup.visible = true;
+            pointLayerGroup.visible = true;
+            baseLayerGroup.visible = true;
+            verticalGuideLines.visible = true;
+            state.targetExplode = 1;
+            if (!state.schematic.active) {
+                state.cam.targetRadius = 18.2;
+                state.cam.targetLookX = 0;
+                state.cam.targetLookY = -0.55;
+                state.cam.targetLookZ = 0;
+            }
+        }
+
+        function setInceptionOrbit(enabled) {
+            state.inceptionOrbit = enabled;
+            if (enabled) {
+                showToast('Inception Orbit Engaged — Click to Pause');
+            } else {
+                state.cam.targetRoll = 0;
+                showToast('Manual Inspection Mode');
+            }
+        }
+
+        let toastTimer = null;
+        function showToast(msg) {
+            const toast = document.getElementById('toast-hint');
+            const text = document.getElementById('toast-message');
+            if (!toast || !text) return;
+            text.textContent = msg;
+            toast.classList.remove('opacity-0', '-translate-y-2');
+            toast.classList.add('opacity-100', 'translate-y-0');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', '-translate-y-2');
+            }, 2400);
+        }
+
+        function initScene() {
+            container = document.getElementById('canvas-container');
+
+            try {
+                renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
+            } catch (e) {
+                document.getElementById('webgl-error').classList.remove('hidden');
+                return false;
+            }
+
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0xffffff, 1);
+            renderer.outputEncoding = THREE.sRGBEncoding;
+            container.appendChild(renderer.domElement);
+
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xffffff);
+
+            camera = new THREE.PerspectiveCamera(36, window.innerWidth / window.innerHeight, 0.1, 120);
+            raycaster = new THREE.Raycaster();
+
+            // Crisp architectural studio lighting
+            const hemiLight = new THREE.HemisphereLight(0xf8fbff, 0xcbd5e1, 0.88);
+            scene.add(hemiLight);
+
+            const keyLight = new THREE.DirectionalLight(0xffffff, 1.05);
+            keyLight.position.set(10, 18, 9);
+            scene.add(keyLight);
+
+            const rimLight = new THREE.DirectionalLight(0xa5f3fc, 0.55);
+            rimLight.position.set(-12, 8, -10);
+            scene.add(rimLight);
+
+            const underFill = new THREE.DirectionalLight(0xe2e8f0, 0.42);
+            underFill.position.set(0, -10, 4);
+            scene.add(underFill);
+
+            // Root container for the floating glacial island
+            islandRoot = new THREE.Group();
+            scene.add(islandRoot);
+
+            audioProjectionsGroup = new THREE.Group();
+            islandRoot.add(audioProjectionsGroup);
+
+            softGroundShadow = buildSoftGroundShadow();
+            scene.add(softGroundShadow);
+
+            buildAllLayers();
+            bindEvents();
+            return true;
+        }
+
+        // ----------------------------------------------------------------------------
+        // 8. INPUT HANDLING (CLICK-TO-ORBIT, DRAG, WHEEL, PINCH, SCHEMATIC EXIT)
+        // ----------------------------------------------------------------------------
+        function bindEvents() {
+            const dom = renderer.domElement;
+
+            function onPointerDown(x, y) {
+                state.pointer.isDown = true;
+                state.pointer.startX = x;
+                state.pointer.startY = y;
+                state.pointer.lastX = x;
+                state.pointer.lastY = y;
+                state.pointer.moved = 0;
+            }
+
+            function onPointerMove(x, y) {
+                if (!state.pointer.isDown) {
+                    const ndcX = (x / window.innerWidth) * 2 - 1;
+                    const ndcY = -(y / window.innerHeight) * 2 + 1;
+                    raycaster.setFromCamera({ x: ndcX, y: ndcY }, camera);
+                    const hits = raycaster.intersectObjects(clickableMeshes, false);
+                    container.classList.toggle('pointer-hover', hits.length > 0);
+                    return;
+                }
+
+                const dx = x - state.pointer.lastX;
+                const dy = y - state.pointer.lastY;
+                state.pointer.lastX = x;
+                state.pointer.lastY = y;
+                state.pointer.moved += Math.hypot(dx, dy);
+
+                if (state.pointer.moved > 6 && state.inceptionOrbit) {
+                    state.inceptionOrbit = false;
+                    state.cam.targetRoll = 0;
+                }
+
+                state.cam.targetTheta -= dx * 0.0068;
+                state.cam.targetPhi = Math.max(0.12, Math.min(Math.PI - 0.14, state.cam.targetPhi - dy * 0.0068));
+            }
+
+            function onPointerUp(x, y) {
+                if (!state.pointer.isDown) return;
+                state.pointer.isDown = false;
+
+                if (state.pointer.moved < 8) {
+                    // Clean click on whole island toggles Inception Orbit
+                    const ndcX = (x / window.innerWidth) * 2 - 1;
+                    const ndcY = -(y / window.innerHeight) * 2 + 1;
+                    raycaster.setFromCamera({ x: ndcX, y: ndcY }, camera);
+                    const hits = raycaster.intersectObjects(clickableMeshes, false);
+                    if (hits.length > 0) {
+                        setInceptionOrbit(!state.inceptionOrbit);
+                    }
+                }
+            }
+
+            dom.addEventListener('mousedown', (e) => onPointerDown(e.clientX, e.clientY));
+            window.addEventListener('mousemove', (e) => onPointerMove(e.clientX, e.clientY));
+            window.addEventListener('mouseup', (e) => onPointerUp(e.clientX, e.clientY));
+
+            dom.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                state.cam.targetRadius = Math.max(5.5, Math.min(28, state.cam.targetRadius + e.deltaY * 0.012));
+                if (state.schematic.active && state.cam.targetRadius > 14.5) {
+                    SchematicInspector.close();
+                }
+            }, { passive: false });
+
+            // Touch support (drag + 2-finger pinch zoom)
+            dom.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 1) {
+                    onPointerDown(e.touches[0].clientX, e.touches[0].clientY);
+                } else if (e.touches.length === 2) {
+                    state.pointer.isDown = false;
+                    state.pointer.pinchDist = Math.hypot(
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
+                    );
+                }
+            }, { passive: true });
+
+            dom.addEventListener('touchmove', (e) => {
+                if (e.touches.length === 1) {
+                    onPointerMove(e.touches[0].clientX, e.touches[0].clientY);
+                } else if (e.touches.length === 2) {
+                    const dist = Math.hypot(
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
+                    );
+                    const delta = state.pointer.pinchDist - dist;
+                    state.pointer.pinchDist = dist;
+                    state.cam.targetRadius = Math.max(5.5, Math.min(28, state.cam.targetRadius + delta * 0.035));
+                    if (state.schematic.active && state.cam.targetRadius > 14.5) {
+                        SchematicInspector.close();
+                    }
+                }
+            }, { passive: true });
+
+            dom.addEventListener('touchend', (e) => {
+                if (e.changedTouches.length > 0) {
+                    onPointerUp(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+                }
+            });
+
+            // Keyboard Escape to close schematic drawer
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && state.schematic.active) {
+                    SchematicInspector.close();
+                }
+            });
+
+            // UI Controls
+            document.getElementById('btn-layers').addEventListener('click', () => {
+                if (state.schematic.active) {
+                    SchematicInspector.close();
+                }
+                applyModeVisibility();
+                showToast('Extended Stratigraphy Layers');
+            });
+
+            document.getElementById('btn-close-drawer').addEventListener('click', () => {
+                SchematicInspector.close();
+            });
+
+            document.getElementById('btn-regenerate').addEventListener('click', () => {
+                regenerateTerrain();
+            });
+
+            document.getElementById('btn-audio').addEventListener('click', () => {
+                GlacialAudio.toggle();
+            });
+
+            document.getElementById('btn-reset').addEventListener('click', () => {
+                if (state.schematic.active) {
+                    SchematicInspector.close();
+                }
+                state.inceptionOrbit = false;
+                state.cam.targetTheta = Math.PI * 0.25;
+                state.cam.targetPhi = Math.PI * 0.35;
+                state.cam.targetRoll = 0;
+                applyModeVisibility();
+                showToast('View Reset');
+            });
+
+            window.addEventListener('resize', () => {
+                if (!camera || !renderer) return;
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+
+        // ----------------------------------------------------------------------------
+        // 9. ANIMATION LOOP
+        // ----------------------------------------------------------------------------
+        let lastTime = 0;
+        function animate(now = 0) {
+            requestAnimationFrame(animate);
+            const dt = Math.min(0.05, (now - lastTime) / 1000 || 0.016);
+            lastTime = now;
+
+            // Smoothly interpolate extended layers spacing
+            state.explodeAmount += (state.targetExplode - state.explodeAmount) * Math.min(1, dt * 6);
+            const ex = state.explodeAmount;
+
+            const topY     =  2.15 * ex;
+            const contourY =  0.10 * ex;
+            const pointY   = -1.95 * ex;
+            const baseY    = -3.95 * ex;
+
+            topLayerGroup.position.y     = topY;
+            contourLayerGroup.position.y = contourY;
+            pointLayerGroup.position.y   = pointY;
+            baseLayerGroup.position.y    = baseY;
+
+            if (verticalGuideLines) {
+                verticalGuideLines.position.y = baseY;
+                verticalGuideLines.scale.y = Math.max(0.01, (topY + 0.35) - baseY);
+                verticalGuideLines.material.opacity = 0.42 * ex;
+            }
+
+            if (softGroundShadow) {
+                softGroundShadow.position.y = baseY - 0.75;
+            }
+
+            // Gentle floating breath of the sculptural island
+            islandRoot.position.y = Math.sin(now * 0.0009) * 0.07;
+
+            // Inception-style cinematic orbit
+            if (state.inceptionOrbit) {
+                state.orbitTime += dt;
+                state.cam.targetTheta += dt * 0.42;
+                state.cam.targetPhi = Math.PI * 0.36 + Math.sin(state.orbitTime * 0.55) * 0.24;
+                state.cam.targetRoll = Math.sin(state.orbitTime * 0.45) * 0.14;
+            }
+
+            // Damped spherical camera interpolation around look target
+            const smooth = Math.min(1, dt * 6.0);
+            state.cam.theta  += (state.cam.targetTheta  - state.cam.theta)  * smooth;
+            state.cam.phi    += (state.cam.targetPhi    - state.cam.phi)    * smooth;
+            state.cam.radius += (state.cam.targetRadius - state.cam.radius) * smooth;
+            state.cam.lookX  += (state.cam.targetLookX  - state.cam.lookX)  * smooth;
+            state.cam.lookY  += (state.cam.targetLookY  - state.cam.lookY)  * smooth;
+            state.cam.lookZ  += (state.cam.targetLookZ  - state.cam.lookZ)  * smooth;
+            state.cam.roll   += (state.cam.targetRoll   - state.cam.roll)   * smooth;
+
+            const r = state.cam.radius;
+            const sinPhi = Math.sin(state.cam.phi);
+            camera.position.set(
+                state.cam.lookX + r * sinPhi * Math.sin(state.cam.theta),
+                state.cam.lookY + r * Math.cos(state.cam.phi),
+                state.cam.lookZ + r * sinPhi * Math.cos(state.cam.theta)
+            );
+            camera.lookAt(state.cam.lookX, state.cam.lookY, state.cam.lookZ);
+
+            if (Math.abs(state.cam.roll) > 0.0001) {
+                camera.rotateZ(state.cam.roll);
+            }
+
+            // Update generative audio, glowing ice chinks, and layer projection beams
+            GlacialAudio.update(dt);
+
+            // Update isolated chunk preview inside right schematic drawer
+            SchematicInspector.update(dt);
+
+            // Render scene & project 3D callout boxes
+            renderer.render(scene, camera);
+            LabelManager.update();
+        }
+
+        // Start on window load
+        window.onload = function () {
+            if (initScene()) {
+                animate();
+            }
+        };
+    </script>
+</body>
+</html>
